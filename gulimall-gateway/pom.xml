@@ -8,10 +8,10 @@
         <version>2.1.8.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.gulimall.coupon</groupId>
-    <artifactId>gulimall-coupon</artifactId>
+    <groupId>com.atguigu.gulimall</groupId>
+    <artifactId>gulimall-gateway</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>gulimall-coupon</name>
+    <name>gulimall-gateway</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -26,13 +26,10 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
