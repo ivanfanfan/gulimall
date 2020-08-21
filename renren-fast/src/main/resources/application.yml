@@ -37,9 +37,9 @@ spring:
         min-idle: 5       # 连接池中的最小空闲连接
   mvc:
     throw-exception-if-no-handler-found: true
+
 #  resources:
 #    add-mappings: false
-
 
 #mybatis
 mybatis-plus:
@@ -74,3 +74,4 @@ renren:
     # token有效时长，7天，单位秒
     expire: 604800
     header: token
+
