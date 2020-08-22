@@ -50,6 +50,12 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return levelOneMenus;//返回一级分类 分类实体中建立了children字段 所以一级分类包含了 子分类。。。
     }
 
+    @Override
+    public void removeMenuByIds(List<Long> asList) {
+        //TODO 检查菜单是否被引用
+        baseMapper.deleteBatchIds(asList);
+    }
+
     private List<CategoryEntity> getChildren(CategoryEntity root, List<CategoryEntity> entities) {
         List<CategoryEntity> children = entities.stream().filter((categoryEntity) -> {
             return categoryEntity.getParentCid() == root.getCatId();
