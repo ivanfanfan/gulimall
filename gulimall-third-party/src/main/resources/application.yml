@@ -1,8 +1,8 @@
 spring:
   cloud:
     alicloud:
-      access-key:
-      secret-key:
+      access-key: LTAI4G7cEZ5eTh9GgNuQP4HX
+      secret-key: lj4OXDMyaXFpukxucAturRQ9YMnWcm
       oss:
         endpoint: oss-cn-beijing.aliyuncs.com
         bucket: gulimaill-wangerfan

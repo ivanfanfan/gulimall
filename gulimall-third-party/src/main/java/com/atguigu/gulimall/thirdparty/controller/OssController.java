@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -35,6 +36,7 @@ public class OssController {
 //        String dir = "user-dir-prefix/"; // 用户上传文件时指定的前缀。
         String format = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         String dir = format+"/";
+
         // 创建OSSClient实例。
         Map<String, String> respMap =null;
         try {
