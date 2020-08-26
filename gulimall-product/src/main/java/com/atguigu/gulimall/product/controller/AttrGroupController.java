@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 
+import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrEntity;
+import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimall.product.service.AttrService;
 import com.atguigu.gulimall.product.service.CategoryService;
 import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
@@ -36,10 +38,19 @@ public class AttrGroupController {
     @Autowired
     AttrService attrService;
 
-
-
-//    /product/attrgroup/attr/relation/delete
+    @Autowired
+    AttrAttrgroupRelationService relationService;
     /**
+     * /product/attrgroup/attr/relation
+     * 添加分组和属性关联关系
+     */
+    @PostMapping("/attr/relation")
+    public R addRelation(@RequestBody List<AttrGroupRelationVo> vos){
+        relationService.saveBatch(vos);
+        return R.ok();
+    }
+
+    /** /product/attrgroup/attr/relation/delete
      * 移除关联属性
      */
     @PostMapping("/attr/relation/delete")
@@ -54,7 +65,15 @@ public class AttrGroupController {
         List<AttrEntity> entities = attrService.getRelationAttr(attrgourpId);
         return R.ok().put("data",entities);
     }
-
+    /**
+     * /product/attrgroup/{attrgroupId}/noattr/relation
+     */
+    @GetMapping("/{attrgroupId}/noattr/relation")
+    public R attrNoRelation(@PathVariable("attrgroupId") Long attrgroupId,
+                            @RequestParam Map<String,Object> params){
+        PageUtils page = attrService.getNorelationAttr(params,attrgroupId);
+        return R.ok().put("page",page);
+    }
     /**
      * 列表
      */
