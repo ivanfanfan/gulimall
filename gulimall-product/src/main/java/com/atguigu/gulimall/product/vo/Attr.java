@@ -3,15 +3,18 @@
   */
 package com.atguigu.gulimall.product.vo;
 
+import lombok.Data;
+
 /**
  * Auto-generated: 2020-08-27 23:12:41
  *
  * @author bejson.com (i@bejson.com)
  * @website http://www.bejson.com/java2pojo/
  */
+@Data
 public class Attr {
 
-    private int attrId;
+    private Long attrId;
     private String attrName;
     private String attrValue;
 
