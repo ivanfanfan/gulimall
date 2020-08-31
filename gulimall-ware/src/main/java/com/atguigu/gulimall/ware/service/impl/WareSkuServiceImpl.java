@@ -1,6 +1,10 @@
 package com.atguigu.gulimall.ware.service.impl;
 
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,14 +20,43 @@ import com.atguigu.gulimall.ware.service.WareSkuService;
 @Service("wareSkuService")
 public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> implements WareSkuService {
 
+    @Autowired
+    WareSkuDao wareSkuDao;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<WareSkuEntity> wrapper = new QueryWrapper<>();
+        String skuId = (String) params.get("skuId");
+        if(!StringUtils.isEmpty(skuId)){
+            wrapper.eq("sku_id",skuId);
+        }
+        String wareId = (String) params.get("wareId");
+        if(!StringUtils.isEmpty(wareId)){
+            wrapper.eq("ware_id",wareId);
+        }
         IPage<WareSkuEntity> page = this.page(
                 new Query<WareSkuEntity>().getPage(params),
-                new QueryWrapper<WareSkuEntity>()
+                wrapper
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void addStock(Long skuId, Long wareId, Integer skuNum) {
+        List<WareSkuEntity> wareSkuEntities = wareSkuDao.selectList(new QueryWrapper<WareSkuEntity>().eq("sku_id", skuId).eq("ware_id", wareId));
+        if(wareSkuEntities.size() == 0 || wareSkuEntities == null){
+            WareSkuEntity skuEntity = new WareSkuEntity();
+            skuEntity.setSkuId(skuId);
+            skuEntity.setWareId(wareId);
+            skuEntity.setStock(skuNum);
+            skuEntity.setStockLocked(0);
+            //TODO 远程
+            skuEntity.setSkuName("");
+            wareSkuDao.insert(skuEntity);
+        }else{
+            wareSkuDao.addStock(skuId,wareId,skuNum);
+        }
+
     }
 
 }

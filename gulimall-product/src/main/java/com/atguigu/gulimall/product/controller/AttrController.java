@@ -1,9 +1,12 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
+import com.atguigu.gulimall.product.entity.ProductAttrValueEntity;
+import com.atguigu.gulimall.product.service.ProductAttrValueService;
 import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
 import com.atguigu.gulimall.product.vo.AttrRespVo;
 import com.atguigu.gulimall.product.vo.AttrVo;
@@ -29,6 +32,14 @@ import com.atguigu.common.utils.R;
 public class AttrController {
     @Autowired
     private AttrService attrService;
+
+    @Autowired
+    ProductAttrValueService productAttrValueService;
+    @GetMapping("/base/listforspu/{spuId}")
+    public R baseAttrList(@PathVariable("spuId") Long spuId){
+        List<ProductAttrValueEntity> entity = productAttrValueService.baseAttrlistforspu(spuId);
+        return R.ok().put("data",entity);
+    }
 
 //    /product/attr/sale/list/{catelogId}  0是基本属性 1是销售属性
     @GetMapping("/{attrType}/list/{catelogId}")
@@ -87,7 +98,13 @@ public class AttrController {
 
         return R.ok();
     }
-
+    @PostMapping("/update/{spuId}")
+    //@RequiresPermissions("product:attr:update")
+    public R updateSpuAttr(@PathVariable("spuId") Long spuId,
+                            @RequestBody List<ProductAttrValueEntity> entities ){
+        productAttrValueService.updateSpuAttr(spuId,entities);
+        return R.ok();
+    }
     /**
      * 删除
      */
