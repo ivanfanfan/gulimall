@@ -2,6 +2,7 @@ package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.common.to.SkuReductionTo;
 import com.atguigu.common.to.SpuBoundsTo;
+import com.atguigu.common.to.es.SkuEsModel;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.feign.CouponFeignService;
@@ -14,9 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -32,7 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("spuInfoService")
 public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
 
-
+    @Autowired
+    CategoryService categoryService;
+    @Autowired
+    BrandService brandService;
     @Autowired
     CouponFeignService couponFeignService;
     @Autowired
@@ -48,7 +50,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     @Autowired
     SpuInfoDescService spuInfoDescService;
     @Autowired
-    ProductAttrValueService productAttrValueService;
+    ProductAttrValueService attrValueService;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<SpuInfoEntity> page = this.page(
@@ -91,7 +93,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             valueEntity.setSpuId(infoEntity.getId());
             return valueEntity;
         }).collect(Collectors.toList());
-        productAttrValueService.saveProductAttr(collect);
+        attrValueService.saveProductAttr(collect);
 
         //5.保存spu的积分信息： gulimall_sms  -》sms_spu_bounds
         Bounds bounds = vo.getBounds();
@@ -195,6 +197,66 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    /**
+     * 商品上架
+     * @param spuId
+     */
+    @Override
+    public void up(Long spuId) {
+        List<SkuEsModel> uoProducts = new ArrayList<>();
+        //组装苏需要的数据
+        //查出当前spuId对应的所有sku信息，品牌名字。
+        List<SkuInfoEntity> skuInfoEntities = skuInfoService.getSkuBySpuId(spuId);
+        //封装每个sku的信息
+        //TODO 查询当前sku的所有可以被检索的规格属性
+        List<ProductAttrValueEntity> baseAttrs = attrValueService.baseAttrlistforspu(spuId);
+        List<Long> attrIds = baseAttrs.stream().map(attr -> {
+            return attr.getAttrId();
+        }).collect(Collectors.toList());
+
+        List<Long> searchAttrIds = attrService.selectSearchAttrs(attrIds);
+        Set<Long> idSet = new HashSet<>(searchAttrIds);
+        List<SkuEsModel.Attrs> attrs = new ArrayList<>();
+
+        List<SkuEsModel.Attrs> attrsList = baseAttrs.stream().filter(item -> {
+            return idSet.contains(item.getAttrId());
+        }).map(item -> {
+            SkuEsModel.Attrs attr = new SkuEsModel.Attrs();
+            BeanUtils.copyProperties(attr, item);
+            return attr;
+
+        }).collect(Collectors.toList());
+
+
+        //封装skuEsModel
+        List<SkuEsModel> collect = skuInfoEntities.stream().map(sku -> {
+            SkuEsModel esModel = new SkuEsModel();
+            BeanUtils.copyProperties(sku,esModel);
+            /**
+                skuprice , skuImg ,hasStock
+                brandName;brandImg;catalogName;Attrs{attrId,attrName,attrValue}
+             */
+            esModel.setSkuPrice(sku.getPrice());
+            esModel.setSkuImg(sku.getSkuDefaultImg());
+            //TODO 远程调用ware 库存系统 查看库存
+            //TODO 热度评分 默认0
+            esModel.setHotScore(0L);
+            // 品牌和分类的名字信息
+            BrandEntity byId = brandService.getById(esModel.getBrandId());
+            esModel.setBrandName(byId.getName());
+            esModel.setBrandImg(byId.getLogo());
+
+            CategoryEntity byId1 = categoryService.getById(esModel.getBrandId());
+            esModel.setCatalogName(byId1.getName());
+
+            //设置检索属性
+            esModel.setAttrs(attrsList);
+            return esModel;
+        }).collect(Collectors.toList());
+
+        // TODO 将数据发送给ES进行保存 调用search服务
     }
 
 
