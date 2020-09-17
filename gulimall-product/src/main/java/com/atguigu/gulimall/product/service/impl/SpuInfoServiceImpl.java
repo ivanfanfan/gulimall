@@ -1,11 +1,13 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.common.to.SkuHasStockVo;
 import com.atguigu.common.to.SkuReductionTo;
 import com.atguigu.common.to.SpuBoundsTo;
 import com.atguigu.common.to.es.SkuEsModel;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.feign.CouponFeignService;
+import com.atguigu.gulimall.product.feign.WareFeignService;
 import com.atguigu.gulimall.product.service.*;
 import com.atguigu.gulimall.product.vo.*;
 import org.apache.commons.lang.StringUtils;
@@ -31,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("spuInfoService")
 public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
 
+    @Autowired
+    WareFeignService wareFeignService;
     @Autowired
     CategoryService categoryService;
     @Autowired
@@ -205,10 +209,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
      */
     @Override
     public void up(Long spuId) {
-        List<SkuEsModel> uoProducts = new ArrayList<>();
         //组装苏需要的数据
         //查出当前spuId对应的所有sku信息，品牌名字。
         List<SkuInfoEntity> skuInfoEntities = skuInfoService.getSkuBySpuId(spuId);
+        List<Long> skuIdList = skuInfoEntities.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
         //封装每个sku的信息
         //TODO 查询当前sku的所有可以被检索的规格属性
         List<ProductAttrValueEntity> baseAttrs = attrValueService.baseAttrlistforspu(spuId);
@@ -228,10 +232,19 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             return attr;
 
         }).collect(Collectors.toList());
-
+        //TODO 远程调用ware 库存系统 查看库存
+        Map<Long, Boolean> stockMap = null;
+        try{
+            R<List<SkuHasStockVo>> skuHasStock = wareFeignService.getSkuHasStock(skuIdList);
+            stockMap = skuHasStock.getData().stream().
+                    collect(Collectors.toMap(SkuHasStockVo::getSkuId, item -> item.getHasStock()));
+        }catch (Exception e){
+            log.error("远程调用查询库存异常");
+        }
 
         //封装skuEsModel
-        List<SkuEsModel> collect = skuInfoEntities.stream().map(sku -> {
+        Map<Long, Boolean> finalStockMap = stockMap;
+        List<SkuEsModel> upProducts = skuInfoEntities.stream().map(sku -> {
             SkuEsModel esModel = new SkuEsModel();
             BeanUtils.copyProperties(sku,esModel);
             /**
@@ -240,7 +253,13 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
              */
             esModel.setSkuPrice(sku.getPrice());
             esModel.setSkuImg(sku.getSkuDefaultImg());
-            //TODO 远程调用ware 库存系统 查看库存
+            if(finalStockMap == null){
+                esModel.setHasStock(true);
+            }else {
+                esModel.setHasStock(finalStockMap.get(sku.getSkuId()));
+            }
+
+            esModel.setHasStock(false);
             //TODO 热度评分 默认0
             esModel.setHotScore(0L);
             // 品牌和分类的名字信息
