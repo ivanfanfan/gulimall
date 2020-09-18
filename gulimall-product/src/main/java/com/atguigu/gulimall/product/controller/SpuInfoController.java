@@ -34,7 +34,7 @@ public class SpuInfoController {
     public R spuUp(@PathVariable("spuId") Long spuId) {
         spuInfoService.up(spuId);
 
-        return R.ok().put("page", page);
+        return R.ok();
     }
 
     /**
