@@ -14,7 +14,9 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
   thymeleaf:
     cache: false
-
+  redis:
+    host: 192.168.200.88
+    port: 6379
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
@@ -31,3 +33,4 @@ ribbon:
   ReadTimeout: 120000
 #请求连接的超时时间
   ConnectTimeout: 30000
+

@@ -1,13 +1,19 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
 import com.atguigu.gulimall.product.vo.Catelog2Vo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.sun.org.apache.xml.internal.resolver.CatalogEntry;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -20,9 +26,15 @@ import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+
+    @Autowired
+    RedissonClient redissonClient;
+    @Autowired
+    StringRedisTemplate redisTemplate;
 
     @Autowired
     CategoryBrandRelationService categoryBrandRelationService;
@@ -82,18 +94,65 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return entities;
     }
 
+    /**
+     * 使用redis 查询
+     * redis 缓存穿透，雪崩，击穿
+     * //TODO 高并发下产生堆外内存异常，应该是元空间溢出，OutOfDirectMemoryError
+     * springboot 2.0使用Lettuce操作redis，他使用netty进行网络间通信。
+     * Lettuce的bug导致netty堆外内存溢出
+     * @return
+     */
     @Override
-    public Map<String, List<Catelog2Vo>> getCatalogJson() {
-        List<CategoryEntity> level1Categorys = getLevel1Categorys();
+    public Map<String, List<Catelog2Vo>> getCatalogJson(){
+        String catalogJson = redisTemplate.opsForValue().get("catelogJson");
+        //redis中没数据的时候 从数据库中查找并放入redis
+        if(StringUtils.isEmpty(catalogJson)){
+            System.out.println("MYSQL————————————————————————");
+            Map<String, List<Catelog2Vo>> catalogJsonFromDB = getCatalogJsonFromDBWithRedissonLock();
+            String s = JSON.toJSONString(catalogJsonFromDB);
+            return catalogJsonFromDB;
+        }
+        //不为空
+        System.out.println("Redis------------------");
+        Map<String,List<Catelog2Vo>> result = JSON.parseObject(catalogJson,new TypeReference<Map<String,List<Catelog2Vo>>>(){});
+        return result;
+    }
+
+    /**
+     * Redisson分布式锁
+     * @return
+     */
+    public Map<String, List<Catelog2Vo>> getCatalogJsonFromDBWithRedissonLock(){
+        RLock lock = redissonClient.getLock("CatalogJson-lock");
+        lock.lock();
+        System.out.println("获取分布式锁成功");
+        Map<String,List<Catelog2Vo>> dataFromDb;
+        try{
+            dataFromDb = getCatalogJsonFromDB();
+        }finally {
+            lock.unlock();
+        }
+        return dataFromDb;
+    }
+    /**
+     * 从数据库查询三级分类数据
+     * @return
+     */
+    public Map<String, List<Catelog2Vo>> getCatalogJsonFromDB() {
+
+        List<CategoryEntity> selectList = baseMapper.selectList(null);
+        //查找一级分类
+        List<CategoryEntity> level1Categorys = getParent_cid(selectList,0L);
+        //查找二级
         Map<String, List<Catelog2Vo>> parent_cid = level1Categorys.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
-            List<CategoryEntity> categoryEntities = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", v.getCatId()));
+            List<CategoryEntity> categoryEntities = getParent_cid(selectList,v.getCatId());
             //找二级分类
             List<Catelog2Vo> catelog2Vos = null;
             if (categoryEntities != null && !categoryEntities.isEmpty()) {
                 catelog2Vos = categoryEntities.stream().map(l2 -> {
                     Catelog2Vo catelog2Vo = new Catelog2Vo(v.getCatId().toString(), null, l2.getCatId().toString(), l2.getName());
                     //找三级分类
-                    List<CategoryEntity> level3Catelog = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", l2.getCatId()));
+                    List<CategoryEntity> level3Catelog = getParent_cid(selectList,l2.getCatId());
                     if(level3Catelog!=null){
                         List<Catelog2Vo.Catalog3Vo> catalog3Vos = level3Catelog.stream().map(l3 -> {
                             Catelog2Vo.Catalog3Vo catalog3Vo = new Catelog2Vo.Catalog3Vo(l2.getCatId().toString(),l3.getCatId().toString(),l3.getName());
@@ -108,7 +167,18 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             }
             return catelog2Vos;
         }));
+
+        String s = JSON.toJSONString(parent_cid);
+        redisTemplate.opsForValue().set("catelogJson",s,1, TimeUnit.DAYS);
         return parent_cid;
+    }
+
+    private List<CategoryEntity> getParent_cid(List<CategoryEntity> selectList,Long parent_cid) {
+        List<CategoryEntity> collect = selectList.stream().filter(item -> {
+            return item.getParentCid() == parent_cid;
+        }).collect(Collectors.toList());
+//        return baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", v.getCatId()));
+        return collect;
     }
 
     private List<Long> findParenPath(Long catelogId,List<Long> paths){
