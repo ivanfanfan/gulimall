@@ -226,16 +226,16 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         List<Long> searchAttrIds = attrService.selectSearchAttrs(attrIds);
         Set<Long> idSet = new HashSet<>(searchAttrIds);
-        List<SkuEsModel.Attrs> attrs = new ArrayList<>();
 
         List<SkuEsModel.Attrs> attrsList = baseAttrs.stream().filter(item -> {
             return idSet.contains(item.getAttrId());
         }).map(item -> {
             SkuEsModel.Attrs attr = new SkuEsModel.Attrs();
-            BeanUtils.copyProperties(attr, item);
+            BeanUtils.copyProperties(item, attr);
             return attr;
 
         }).collect(Collectors.toList());
+
         //TODO 远程调用ware 库存系统 查看库存
         Map<Long, Boolean> stockMap = null;
         try{
@@ -266,7 +266,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 esModel.setHasStock(finalStockMap.get(sku.getSkuId()));
             }
 
-            esModel.setHasStock(false);
+            esModel.setHasStock(true);
             //TODO 热度评分 默认0
             esModel.setHotScore(0L);
             // 品牌和分类的名字信息
@@ -276,7 +276,6 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
             CategoryEntity byId1 = categoryService.getById(esModel.getCatalogId());
             esModel.setCatalogName(byId1.getName());
-
             //设置检索属性
             esModel.setAttrs(attrsList);
             return esModel;

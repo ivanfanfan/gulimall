@@ -1,10 +1,15 @@
 package com.atguigu.gulimall.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.to.es.SkuEsModel;
+import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.search.config.GulimallElasticSearchConfig;
 import com.atguigu.gulimall.search.constant.EsConstant;
+import com.atguigu.gulimall.search.feign.ProductFeignService;
 import com.atguigu.gulimall.search.service.MallSearchService;
+import com.atguigu.gulimall.search.vo.AttrResponseVo;
+import com.atguigu.gulimall.search.vo.BrandVo;
 import com.atguigu.gulimall.search.vo.SearchParam;
 import com.atguigu.gulimall.search.vo.SearchResult;
 import org.apache.lucene.search.join.ScoreMode;
@@ -34,6 +39,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,6 +52,8 @@ public class MallSearchServiceImpl implements MallSearchService {
     @Autowired
     private RestHighLevelClient client;
 
+    @Autowired
+    private ProductFeignService productFeignService;
     @Override
     public SearchResult search(SearchParam param) {
         //构建DSL语句
@@ -87,7 +96,7 @@ public class MallSearchServiceImpl implements MallSearchService {
         }
         //bool --- filter品牌过滤
         if(param.getBrandId()!=null&&param.getBrandId().size()>0){
-            boolQuery.filter(QueryBuilders.termsQuery("catalogId",param.getBrandId()));
+            boolQuery.filter(QueryBuilders.termsQuery("brandId",param.getBrandId()));
         }
         //TODO bool --- filter按照属性过滤
         if(param.getAttrs()!=null && param.getAttrs().size()>0){
@@ -104,7 +113,9 @@ public class MallSearchServiceImpl implements MallSearchService {
             }
         }
         //bool --- filter 按照库存过滤
-        boolQuery.filter(QueryBuilders.termsQuery("hasStock",param.getHasStock()==1));
+        if(param.getHasStock()!=null){
+            boolQuery.filter(QueryBuilders.termsQuery("hasStock",param.getHasStock()==1));
+        }
         //bool --- filter 按照价格区间
         if(!StringUtils.isEmpty(param.getSkuPrice())){
             RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("skuPrice");
@@ -143,7 +154,8 @@ public class MallSearchServiceImpl implements MallSearchService {
             sourceBuilder.highlighter(builder);
         }
 
-
+        String s = sourceBuilder.toString();
+        System.out.println(s);
 
         /**
          * 聚合分析
@@ -263,9 +275,92 @@ public class MallSearchServiceImpl implements MallSearchService {
         result.setTotal(total);
         //总页码
         int totalPages = total%EsConstant.PRODUCT_PAGESIZE == 0 ? (int)(total/EsConstant.PRODUCT_PAGESIZE) : (int)(total/EsConstant.PRODUCT_PAGESIZE+1);
-        result.setTotalPage(totalPages);
+        result.setTotalPages(totalPages);
+        List<Integer> pageNavs = new ArrayList<>();
+        for(int i = 1;i<=totalPages;i++){
+            pageNavs.add(i);
+        }
+        result.setPageNavs(pageNavs);
+
+        /**
+         * 面包屑导航
+         */
+        // 构建面包屑属性导航
+        if (param.getAttrs() != null && param.getAttrs().size() > 0) {
+            List<SearchResult.NavVo> collect = param.getAttrs().stream().map(attr -> { //nullPointException
+                SearchResult.NavVo navVo = new SearchResult.NavVo();
+                //属性值
+                String[] s = attr.split("_");
+                navVo.setNavValue(s[1]);
+                R r = productFeignService.attrInfo(Long.parseLong(s[0]));
+                if(r.getCode() == 0){
+                    AttrResponseVo data = r.getData("attr", new TypeReference<AttrResponseVo>() {
+                    });
+                    navVo.setNavName(data.getAttrName());
+                }else {
+                    navVo.setNavName(s[0]);
+                }
+
+                /**
+                 * 取消面包屑跳转
+                 */
+                result.getAttrIds().add(Long.parseLong(s[0]));
+
+                if (r.getCode() == 0) {
+                    AttrResponseVo responseVo = r.getData("attr", new TypeReference<AttrResponseVo>() {});
+                    navVo.setNavName(responseVo.getAttrName());
+                } else {
+                    navVo.setNavName(s[0]);
+                }
+
+                // 取消面包屑以后，重新设置面包屑需要显示的url地址
+                String replace = replaceQueryString(param, attr, "attrs");
+                navVo.setLink("http://search.gulimall.com/list.html?"+replace);
+                return navVo;
+            }).collect(Collectors.toList());
+            result.setNavs(collect);
+        }
+
+
+
+        // 构建品牌和分类的面包屑导航
+        if (param.getBrandId() != null && param.getBrandId().size() > 0) {
+            List<SearchResult.NavVo> navs = result.getNavs();
+
+            SearchResult.NavVo navVo = new SearchResult.NavVo();
+            navVo.setNavName("品牌");
+            R r = productFeignService.brandsInfo(param.getBrandId());
+            if (r.getCode() == 0) {
+                List<BrandVo> brands = r.getData("brands", new TypeReference<List<BrandVo>>() {});
+                StringBuffer buffer = new StringBuffer();
+                String replace = null;
+                for (BrandVo brand : brands) {
+                    buffer.append(brand.getName()+";");
+
+                    replace = replaceQueryString(param, brand.getBrandId() + "", "brandId");
+                }
+                navVo.setNavValue(buffer.toString());
+
+                navVo.setLink("http://search.gulimall.com/list.html?" + replace);
+
+            }
+            navs.add(navVo);
+
+        }
+
+
         return result;
+
     }
 
-
+    private String replaceQueryString(SearchParam param, String value, String key) {
+        String encode = null;
+        try {
+            encode = URLEncoder.encode(value, "UTF-8");
+            encode = encode.replace("+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return param.get_queryString().replace("&" + key + "=" + encode, "");
+    }
 }

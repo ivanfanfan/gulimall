@@ -38,6 +38,7 @@ public class ProductSaveServiceImpl implements ProductSaveService {
         for(SkuEsModel model : skuEsModels){
             IndexRequest indexRequest = new IndexRequest(EsConstant.PRODUCT_INDEX);
             indexRequest.id(String.valueOf(model.getSkuId()));
+            model.setHasStock(true);
             String s = JSON.toJSONString(model);
             indexRequest.source(s, XContentType.JSON);
             bulkRequest.add(indexRequest);

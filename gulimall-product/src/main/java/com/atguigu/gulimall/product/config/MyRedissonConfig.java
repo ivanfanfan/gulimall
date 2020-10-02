@@ -19,7 +19,7 @@ public class MyRedissonConfig {
     public RedissonClient redisson() throws IOException {
         //建立配置
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://192.168.200.88:6379");
+        config.useSingleServer().setAddress("redis://192.168.88.88:6379");
         //按照配置创建实例RedissonClient
         return Redisson.create(config);
 

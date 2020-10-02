@@ -63,11 +63,18 @@
             </div>
         </b>
         <ul>
-            <li>
-                <a href="/static/search/#" class="li_2">你好，请登录</a>
+            <li th:if="${session.loginUser == null}">
+                <a href="http://auth.gulimall.com/login.html" class="li_2">你好，请登录</a>
             </li>
-            <li>
-                <a href="/static/search/#">免费注册</a>
+
+            <li href="" th:if="${session.loginUser != null}">
+                <a href="">
+                    [[${session.loginUser.nickname == null? '欢迎' : session.loginUser.nickname}]]
+                </a>
+            </li>
+
+            <li th:if="${session.loginUser == null}">
+                <a  href="http://auth.gulimall.com/reg.html">免费注册</a>
             </li>
             <span>|</span>
             <li>
@@ -76,7 +83,7 @@
             <span>|</span>
             <li class="header_wdjd" style="width:80px;">
                 <a href="/static/search/#">我的谷粒商城</a>
-                <img src="/static/search/image/down-@1x.png" />
+                <img src="/static/search/image/down-@1x.png"/>
                 <!--<b class="glyphicon glyphicon-menu-down"></b>-->
                 <div class="header_wdjd_txt">
                     <ul>
@@ -126,7 +133,7 @@
             <span>|</span>
             <li class="header_wdjd1">
                 <a href="/static/search/#">客户服务</a>
-                <img src="/static/search/image/down-@1x.png" />
+                <img src="/static/search/image/down-@1x.png"/>
                 <!--<b class="glyphicon glyphicon-menu-down"></b>-->
                 <div class="header_wdjd_txt">
                     <ul>
@@ -182,7 +189,7 @@
             <span>|</span>
             <li class="header_wzdh">
                 <a href="/static/search/#">网站导航</a>
-                <img src="/static/search/image/down-@1x.png" />
+                <img src="/static/search/image/down-@1x.png"/>
                 <!--<b class="glyphicon glyphicon-menu-down"></b>-->
                 <div class="header_wzdh_txt">
                     <ul style="width: 25%;">
@@ -389,7 +396,7 @@
             <li class="header_sjjd">
                 <a href="/static/search/#">手机谷粒商城</a>
                 <div class="header_sjjd_div">
-                    <img src="/static/search/img/01.png" />
+                    <img src="/static/search/img/01.png"/>
                 </div>
             </li>
         </ul>
@@ -399,16 +406,16 @@
 <!--搜索导航-->
 <div class="header_sous">
     <div class="logo">
-        <a href="http://gulimall.com"><img src="/static/search/./image/logo1.jpg" alt=""></a>
+        <a href="http://gulimall.com"><img src="/static/search/image/logo1.jpg" alt=""></a>
     </div>
     <div class="header_form">
-        <input type="text" placeholder="手机" />
-        <a href="/static/search/#">搜索</a>
+        <input id="keyword_input" type="text" placeholder="京东二号" th:value="${param.keyword}"/>
+        <a href="javascript:searchKeyword();">搜索</a>
     </div>
     <div class="header_ico">
         <div class="header_gw">
             <span><a href="/static/search/#">我的购物车</a></span>
-            <img src="/static/search/image/settleup-@1x.png" />
+            <img src="/static/search/image/settleup-@1x.png"/>
             <span>0</span>
         </div>
         <div class="header_ko">
@@ -598,18 +605,18 @@
                     </ol>
                     <div class="header_r">
                         <div class="header_r_tu">
-                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg" /></a>
-                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg" /></a>
-                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg" /></a>
-                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg" /></a>
-                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg" /></a>
-                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg" /></a>
-                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg" /></a>
-                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg" /></a>
+                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg"/></a>
+                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg"/></a>
+                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg"/></a>
+                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg"/></a>
+                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg"/></a>
+                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg"/></a>
+                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg"/></a>
+                            <a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg"/></a>
                         </div>
                         <div class="header_r_tu1">
-                            <a href="/static/search/#"><img src="/static/search/img/JD_ash7 - 副本.png" /></a>
-                            <a href="/static/search/#"><img src="/static/search/img/JD_ash6.png" /></a>
+                            <a href="/static/search/#"><img src="/static/search/img/JD_ash7 - 副本.png"/></a>
+                            <a href="/static/search/#"><img src="/static/search/img/JD_ash6.png"/></a>
                         </div>
                     </div>
                 </div>
@@ -761,8 +768,12 @@
                 <a href="/static/search/#">拍照手机</a>
                 <a href="/static/search/#">游戏手机</a>
             </div>
+
         </div>
         <i><img src="/static/search/image/right-@1x.png" alt=""></i>
+        <div class="JD_ipone_one c">
+            <a th:href="${nav.link}" th:each="nav : ${result.navs}"><span th:text="${nav.navName}"></span>：<span th:text="${nav.navValue}"></span> ×</a>
+        </div>
     </div>
 </div>
 
@@ -773,196 +784,30 @@
             <!--手机商品筛选-->
             <div class="title">
                 <h3><b>手机</b><em>商品筛选</em></h3>
-                <div class="st-ext">共&nbsp;<span>10135</span>个商品 </div>
+                <div class="st-ext">共&nbsp;<span>10135</span>个商品</div>
             </div>
-            <div class="JD_nav_logo">
+            <div class="JD_nav_logo" th:with="brandId=${param.brandId}">
                 <!--品牌-->
-                <div class="JD_nav_wrap">
+                <div class="JD_nav_wrap"  th:if="${#strings.isEmpty(brandId)}">
                     <div class="sl_key">
-                        <span>品牌：</span>
+                        <span><b>品牌：</b></span>
                     </div>
                     <div class="sl_value">
                         <div class="sl_value_logo">
                             <ul>
-                                <li>
-                                    <a href="/static/search/#">
-                                        <img src="/static/search/img/598033b4nd6055897.jpg" alt="">
-                                        <div>
+                                <li th:each="brand : ${result.brands}">
+                                    <a href="/static/search/#" th:href="${'javascript:searchProcucts(&quot;brandId&quot;,' + brand.brandId + ')'}">
+                                        <img th:src="${brand.brandImg}" alt="">
+                                        <div th:text="${brand.brandName}">
                                             华为(HUAWEI)
                                         </div>
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="/static/search/#">
-                                        <img src="/static/search/img/598042c9n6e4e79e5.jpg" alt="">
-                                        <div>
-                                            小米(MI)
-                                        </div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/static/search/#">
-                                        <img src="/static/search/img/574d36dbn262ef26d.jpg" alt="">
-                                        <div>
-                                            Apple
-                                        </div>
-                                    </a>
-                                </li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/57fdf4b8n6e95624d.jpg" alt="">
-                                    <div>
-                                        魅族(MEIZU)
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/5716e2c4nc925baf3.jpg" alt="">
-                                    <div>
-                                        三星(SAMSUNG)
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/591aa1abn602ebecf.jpg" alt="">
-                                    <div>
-                                        360
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/56b2f385n8e4eb051.jpg" alt="">
-                                    <div>
-                                        oppo
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/563b3484n9ba68e13.jpg" alt="">
-                                    <div>
-                                        vivo
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/563b33ffn9c288c6c.jpg" alt="">
-                                    <div>
-                                        一加
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/563b33d4n6c59780c.jpg" alt="">
-                                    <div>
-                                        诺基亚（NOKIA）
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/5631ccdene8df5efb.jpg" alt="">
-                                    <div>
-                                        锤子(smartisan)
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/58f74d5an23fc1dff.jpg" alt="">
-                                    <div>
-                                        金立(Gionee)
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/5670cf96ncffa2ae6.jpg" alt="">
-                                    <div>
-                                        酷派(Coolpad)
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/5631cd12n7548352d.jpg" alt="">
-                                    <div>
-                                        努比亚(nubia)
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/56a855a3ne38ee719.jpg" alt="">
-                                    <div>
-                                        中兴(ZTE)
-                                    </div>
-                                </a></li>
-                                <li><a href="/static/search/#"><img src="/static/search/img/5836e479n88a98abb.jpg" alt="">
-                                    <div>
-                                        美图(meitu)
-                                    </div>
-                                </a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="sl_ext">
                         <a href="/static/search/#">
-                            更多
-                            <i style='background: url("/static/search/image/search.ele.png")no-repeat 3px 7px'></i>
-                            <b style='background: url("/static/search/image/search.ele.png")no-repeat 3px -44px'></b>
-                        </a>
-                        <a href="/static/search/#">
-                            多选
-                            <i>+</i>
-                            <span>+</span>
-                        </a>
-                    </div>
-                </div>
-                <!--价格-->
-                <div class="JD_pre">
-                    <div class="sl_key">
-                        <span>价格：</span>
-                    </div>
-                    <div class="sl_value">
-                        <ul>
-                            <li><a href="/static/search/#">0-499</a></li>
-                            <li><a href="/static/search/#">500-999</a></li>
-                            <li><a href="/static/search/#">1000-1699</a></li>
-                            <li><a href="/static/search/#">1700-2799</a></li>
-                            <li><a href="/static/search/#">2800-4499</a></li>
-                            <li><a href="/static/search/#">4500-11999</a></li>
-                            <li><a href="/static/search/#">12000以上</a></li>
-                            <li class="sl_value_li">
-                                <input type="text">
-                                <p>-</p>
-                                <input type="text">
-                                <a href="/static/search/#">确定</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!--系统-->
-                <div class="JD_pre">
-                    <div class="sl_key">
-                        <span>系统：</span>
-                    </div>
-                    <div class="sl_value">
-                        <ul>
-                            <li><a href="/static/search/#">0-安卓（Android）</a></li>
-                            <li><a href="/static/search/#">苹果（IOS）</a></li>
-                            <li><a href="/static/search/#">微软（WindowsPhone）</a></li>
-                            <li><a href="/static/search/#">基础功能机系统 </a></li>
-                            <li><a href="/static/search/#">其他</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <!--屏幕尺寸-->
-                <div class="JD_pre">
-                    <div class="sl_key">
-                        <span>屏幕尺寸：</span>
-                    </div>
-                    <div class="sl_value">
-                        <ul>
-                            <li><a href="/static/search/#">5.56英寸及以上</a></li>
-                            <li><a href="/static/search/#">5.5-5.1英寸</a></li>
-                            <li><a href="/static/search/#">5.0-4.6英寸</a></li>
-                            <li><a href="/static/search/#">4.5-3.1英寸</a></li>
-                            <li><a href="/static/search/#">3.0英寸以下</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <!--热点-->
-                <div class="JD_pre">
-                    <div class="sl_key">
-                        <span>热点：</span>
-                    </div>
-                    <div class="sl_value">
-                        <ul>
-                            <li><a href="/static/search/#">以旧换新</a></li>
-                            <li><a href="/static/search/#">功能机</a></li>
-                            <li><a href="/static/search/#">儿童手机</a></li>
-                            <li><a href="/static/search/#">合约机</a></li>
-                            <li><a href="/static/search/#">全面屏</a></li>
-                            <li><a href="/static/search/#">直板键盘</a></li>
-                            <li><a href="/static/search/#">翻盖</a></li>
-                            <li><a href="/static/search/#">商务手机</a></li>
-                            <li><a href="/static/search/#">安全手机</a></li>
-                            <li><a href="/static/search/#">键盘手机</a></li>
-                        </ul>
-                    </div>
-                    <div class="sl_ext">
-                        <a href="/static/search/#" class="sl_ext_show">
                             更多
                             <i style='background: url("image/search.ele.png")no-repeat 3px 7px'></i>
                             <b style='background: url("image/search.ele.png")no-repeat 3px -44px'></b>
@@ -974,27 +819,28 @@
                         </a>
                     </div>
                 </div>
-                <!--机身颜色-->
+
+                <!--分类-->
                 <div class="JD_pre">
                     <div class="sl_key">
-                        <span>机身颜色：</span>
+                        <span><b>分类：</b></span>
                     </div>
                     <div class="sl_value">
                         <ul>
-                            <li><a href="/static/search/#">白色</a></li>
-                            <li><a href="/static/search/#">黑色</a></li>
-                            <li><a href="/static/search/#">灰色</a></li>
-                            <li><a href="/static/search/#">金色</a></li>
-                            <li><a href="/static/search/#">银色</a></li>
-                            <li><a href="/static/search/#">红色</a></li>
-                            <li><a href="/static/search/#">蓝色</a></li>
-                            <li><a href="/static/search/#">粉色</a></li>
-                            <li><a href="/static/search/#">黄的</a></li>
-                            <li><a href="/static/search/#">蓝色</a></li>
+                            <li th:each="catalog : ${result.catalogs}">
+                                <a href="/static/search/#"
+                                   th:href="${'javascript:searchProcucts(&quot;catalog3Id&quot;,' + catalog.catalogId + ')'}"
+                                   th:text="${catalog.catalogName}">手机</a>
+                            </li>
                         </ul>
                     </div>
+
                     <div class="sl_ext">
-                        <a href="/static/search/#"></a>
+                        <a href="/static/search/#">
+                            更多
+                            <i style='background: url("image/search.ele.png")no-repeat 3px 7px'></i>
+                            <b style='background: url("image/search.ele.png")no-repeat 3px -44px'></b>
+                        </a>
                         <a href="/static/search/#">
                             多选
                             <i>+</i>
@@ -1002,32 +848,23 @@
                         </a>
                     </div>
                 </div>
-                <!--机身内存-->
-                <div class="JD_pre" style="border: 0">
+
+                <!--其他所有属性-->
+                <div class="JD_pre" th:each="attr : ${result.attrs}" th:if="${!#lists.contains(result.attrIds,attr.attrId)}">
                     <div class="sl_key">
-                        <span>机身内存：</span>
+                        <span th:text="${attr.attrName}+ '：'">屏幕尺寸：</span>
                     </div>
                     <div class="sl_value">
                         <ul>
-                            <li><a href="/static/search/#">16G</a></li>
-                            <li><a href="/static/search/#">8G</a></li>
-                            <li><a href="/static/search/#">256G</a></li>
-                            <li><a href="/static/search/#">128G</a></li>
-                            <li><a href="/static/search/#">64G</a></li>
-                            <li><a href="/static/search/#">32G</a></li>
-                            <li><a href="/static/search/#">8G以下</a></li>
-                            <li><a href="/static/search/#">支持内存卡</a></li>
+                            <li th:each="attrValue : ${attr.attrValue}">
+                                <a href="/static/search/#"
+                                   th:href="${'javascript:searchProcucts(&quot;attrs&quot;,&quot;' + attr.attrId + '_' + attrValue + '&quot;)'}"
+                                   th:text="${attrValue}">5.56英寸及以上</a>
+                            </li>
                         </ul>
                     </div>
-                    <div class="sl_ext">
-                        <a href="/static/search/#"></a>
-                        <a href="/static/search/#">
-                            多选
-                            <i>+</i>
-                            <span>+</span>
-                        </a>
-                    </div>
                 </div>
+
             </div>
             <div class="JD_show">
                 <a href="/static/search/#">
@@ -1204,12 +1041,29 @@
                 <div class="filter">
                     <!--综合排序-->
                     <div class="filter_top">
-                        <div class="filter_top_left">
-                            <a href="/static/search/#">综合排序</a>
-                            <a href="/static/search/#">销量</a>
-                            <a href="/static/search/#">价格</a>
-                            <a href="/static/search/#">评论分</a>
-                            <a href="/static/search/#">上架时间</a>
+                        <div class="filter_top_left" th:with="p = ${param.sort},priceRange = ${param.skuPrice}">
+                            <a sort="hotScore" href="#"
+                               th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p,'hotScore') && #strings.endsWith(p,'desc'))? 'sort_a desc' : 'sort_a'}"
+                               th:attr="style=${(#strings.isEmpty(p) || #strings.startsWith(p,'hotScore'))? 'color: #FFF;border-color:#e4393c;background: #e4393c' : 'color: #333;border-color:#CCC;background: #FFF' }" >
+                                综合排序[[ ${(!#strings.isEmpty(p) && #strings.startsWith(p,'hotScore') && #strings.endsWith(p,'desc'))? '↓' : '↑' } ]] </a>
+
+                            <a sort="saleCount" href="#"
+                               th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p,'saleCount') && #strings.endsWith(p,'desc'))? 'sort_a desc' : 'sort_a'}"
+                               th:attr="style=${(!#strings.isEmpty(p) && #strings.startsWith(p,'saleCount'))? 'color: #FFF;border-color:#e4393c;background: #e4393c' : 'color: #333;border-color:#CCC;background: #FFF' }" >
+                                销量[[ ${(!#strings.isEmpty(p) && #strings.startsWith(p,'saleCount') && #strings.endsWith(p,'desc'))? '↓' : '↑' } ]]</a>
+
+                            <a sort="skuPrice" href="#"
+                               th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p,'skuPrice') && #strings.endsWith(p,'desc'))? 'sort_a desc' : 'sort_a'}"
+                               th:attr="style=${(!#strings.isEmpty(p) && #strings.startsWith(p,'skuPrice'))? 'color: #FFF;border-color:#e4393c;background: #e4393c' : 'color: #333;border-color:#CCC;background: #FFF' }">
+                                价格[[ ${(!#strings.isEmpty(p) && #strings.startsWith(p,'skuPrice') && #strings.endsWith(p,'desc'))? '↓' : '↑' } ]]</a>
+
+                            <a class="sort_a" href="#">评论分</a>
+                            <a class="sort_a" href="#">上架时间</a>
+                            <!-- 价格区间 -->
+                            <input id="skuPriceFrom" type="number" style="width: 80px;margin-left: 30px;" th:value="${#strings.isEmpty(priceRange)? '' : #strings.substringBefore(priceRange,'_')}"> -
+                            <input id="skuPriceTo" type="number" style="width: 80px;" th:value="${#strings.isEmpty(priceRange)? '' : #strings.substringAfter(priceRange,'_')}">
+                            <button id="skuPriceSearchBtn">确定</button>
+
                         </div>
                         <div class="filter_top_right">
                             <span class="fp-text">
@@ -1308,7 +1162,7 @@
                                 <li>
                                     <a href="/static/search/#">
                                         <i></i>
-                                        京尊达                                    </a>
+                                        京尊达 </a>
                                 </li>
                                 <li>
                                     <a href="/static/search/#">
@@ -1317,8 +1171,8 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/static/search/#">
-                                        <i></i>
+                                    <a href="#" th:with="check = ${param.hasStock}">
+                                        <input id="showHasStock" type="checkbox" th:checked="${ #strings.equals(check,'1') }">
                                         仅显示有货
                                     </a>
                                 </li>
@@ -1332,27 +1186,31 @@
                         </div>
 
                     </div>
-                    <!--排序内容-->
+                    <!-- 排序内容 商品内容 每四个一组 -->
                     <div class="rig_tab">
-                        <div th:each="product:${result.getProducts()}">
+                        <div th:each="product : ${result.getProducts()}">
                             <div class="ico">
                                 <i class="iconfont icon-weiguanzhu"></i>
                                 <a href="/static/search/#">关注</a>
                             </div>
                             <p class="da">
-                                <a href="/static/search/#" >
+                                <a th:href="|http://item.gulimall.com/${product.skuId}.html|">
                                     <img th:src="${product.getSkuImg()}" class="dim">
                                 </a>
                             </p>
                             <ul class="tab_im">
-                                <li><a href="/static/search/#" title="黑色">
-                                    <img th:src="${product.getSkuImg()}"></a></li>
+                                <li>
+                                    <a href="/static/search/#" title="黑色">
+                                        <img th:src="${product.getSkuImg()}">
+                                    </a>
+                                </li>
+
                             </ul>
                             <p class="tab_R">
                                 <span th:text="'￥'+${product.getSkuPrice()}">¥5199.00</span>
                             </p>
                             <p class="tab_JE">
-                                <a href="/static/search/#" th:utext="${product.skuTitle}">
+                                <a href="/static/search/#" th:utext="${product.getSkuTitle()}">
                                     Apple iPhone 7 Plus (A1661) 32G 黑色 移动联通电信4G手机
                                 </a>
                             </p>
@@ -1375,29 +1233,33 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
+
                     <!--分页-->
                     <div class="filter_page">
                         <div class="page_wrap">
                             <span class="page_span1">
-                                <a href="/static/search/#">
+                                <a class="page_a"
+                                   th:attr="pn=${result.pageNum - 1}"
+                                   th:if="${result.pageNum > 1}">
                                     < 上一页
                                 </a>
-                                <a href="/static/search/#" style="border: 0;color:#ee2222;background: #fff">1</a>
-                                <a href="/static/search/#">2</a>
-                                <a href="/static/search/#">3</a>
-                                <a href="/static/search/#" style="border: 0;font-size: 20px;color: #999;background: #fff">...</a>
-                                <a href="/static/search/#">169</a>
-                                <a href="/static/search/#">
+                                <a class="page_a"
+                                   th:attr="pn=${pageNav}, style=${pageNav == result.pageNum ? 'border: 0;color:#ee2222;background: #fff' : ''}"
+                                   th:each="pageNav : ${result.pageNavs}">
+                                    [[${pageNav}]]
+                                </a>
+                                <a class="page_a"
+                                   th:attr="pn=${result.pageNum + 1}"
+                                   th:if="${result.pageNum < result.totalPages}">
                                     下一页 >
                                 </a>
                             </span>
                             <span class="page_span2">
-                                <em>共<b>169</b>页&nbsp;&nbsp;到第</em>
+                                <em>共<b>[[ ${result.totalPages} ]]</b>页&nbsp;&nbsp;到第</em>
                                 <input type="number" value="1">
                                 <em>页</em>
-                                <a href="/static/search/#">确定</a>
+                                <a class="page_submit" >确定</a>
                             </span>
                         </div>
                     </div>
@@ -1926,7 +1788,7 @@
             <a href="/static/search/#">违法和不良信息举报电话：4006561155</a>
         </p>
         <p class="footer_p">
-            <a href="/static/search/#">Copyright © 2004 - 2017  谷粒商城JD.com 版权所有</a>
+            <a href="/static/search/#">Copyright © 2004 - 2017 谷粒商城JD.com 版权所有</a>
             <span></span>
             <a href="/static/search/#">消费者维权热线：4006067733</a>
             <a href="/static/search/#">经营证照</a>
@@ -1953,38 +1815,38 @@
     <div class="header_bar_box">
         <ul>
             <li>
-                <a href="/static/search/#"><img src="/static/search/img/wo.png" /></a>
+                <a href="/static/search/#"><img src="/static/search/img/wo.png"/></a>
                 <div class="div">
                     <a href="/static/search/#">谷粒商城会员</a>
                 </div>
             </li>
             <li>
-                <a href="/static/search/#"><img src="/static/search/img/gouwuche.png" /></a>
+                <a href="/static/search/#"><img src="/static/search/img/gouwuche.png"/></a>
                 <div class="div">
                     <a href="/static/search/#">购物车</a>
                 </div>
             </li>
             <li>
-                <a href="/static/search/#"><img src="/static/search/img/taoxin.png" /></a>
+                <a href="/static/search/#"><img src="/static/search/img/taoxin.png"/></a>
                 <div class="div">
                     <a href="/static/search/#">我的关注</a>
                 </div>
             </li>
 
             <li>
-                <a href="/static/search/#"><img src="/static/search/img/shi.png" /></a>
+                <a href="/static/search/#"><img src="/static/search/img/shi.png"/></a>
                 <div class="div">
                     <a href="/static/search/#">我的足迹</a>
                 </div>
             </li>
             <li>
-                <a href="/static/search/#"><img src="/static/search/img/xinxi.png" /></a>
+                <a href="/static/search/#"><img src="/static/search/img/xinxi.png"/></a>
                 <div class="div">
                     <a href="/static/search/#">我的消息</a>
                 </div>
             </li>
             <li>
-                <a href="/static/search/#"><img src="/static/search/img/qianbao.png" /></a>
+                <a href="/static/search/#"><img src="/static/search/img/qianbao.png"/></a>
                 <div class="div">
                     <a href="/static/search/#">资讯JIMI</a>
                 </div>
@@ -1992,13 +1854,13 @@
         </ul>
         <ul>
             <li>
-                <a href="/static/search/#"><img src="/static/search/img/fa3f24a70d38bd439261cb7439e517a5.png" /></a>
+                <a href="/static/search/#"><img src="/static/search/img/fa3f24a70d38bd439261cb7439e517a5.png"/></a>
                 <div class="div">
                     <a href="/static/search/#">顶部</a>
                 </div>
             </li>
             <li>
-                <a href="/static/search/#"><img src="/static/search/img/xinxi.png" /></a>
+                <a href="/static/search/#"><img src="/static/search/img/xinxi.png"/></a>
                 <div class="div">
                     <a href="/static/search/#">反馈</a>
                 </div>
@@ -2008,77 +1870,76 @@
 </div>
 
 <script>
-    $(".sl_ext a:nth-child(1)").hover(function(){
-        $(this).children("b").stop(true).animate({top:"3px"},50);
-        $(this).children("i").stop(true).animate({top:"-23px"},50)
-    },function(){
-        $(this).children("b").stop(true).animate({top:"24px"},50);
-        $(this).children("i").stop(true).animate({top:"3px"},50)
+    $(".sl_ext a:nth-child(1)").hover(function () {
+        $(this).children("b").stop(true).animate({top: "3px"}, 50);
+        $(this).children("i").stop(true).animate({top: "-23px"}, 50)
+    }, function () {
+        $(this).children("b").stop(true).animate({top: "24px"}, 50);
+        $(this).children("i").stop(true).animate({top: "3px"}, 50)
     });
-    $(".sl_ext a:nth-child(2)").hover(function(){
-        $(this).children("span").stop(true).animate({top:"-1px"},100);
-        $(this).children("i").stop(true).animate({top:"-14px"},100).css({display:"none"})
-    },function(){
-        $(this).children("span").stop(true).animate({top:"14px"},100);
-        $(this).children("i").stop(true).animate({top:"-1px"},100).css({display:"block"})
+    $(".sl_ext a:nth-child(2)").hover(function () {
+        $(this).children("span").stop(true).animate({top: "-1px"}, 100);
+        $(this).children("i").stop(true).animate({top: "-14px"}, 100).css({display: "none"})
+    }, function () {
+        $(this).children("span").stop(true).animate({top: "14px"}, 100);
+        $(this).children("i").stop(true).animate({top: "-1px"}, 100).css({display: "block"})
     });
-    $('.tab_im img').hover(function(){
-        var a=$(this).prop('src');
-        var index=$(this).parents('li').index();
-        $(this).parents('li').css('border','2px solid red').siblings('li').css('border','1px solid #ccc');
-        $(this).parents('ul').prev().find('img').prop('src',a);
-        $(this).parents('ul').siblings('.tab_JE').find('a').eq(index).css('display','block').siblings('a').css('display','none');
-        $(this).parents('ul').siblings('.tab_R').find('span').eq(index).css('display','block').siblings('span').css('display','none')
-    });
-
-    $(".JD_ipone_one").hover(function(){
-        $(this).children("div").css({display:"block"})
-    },function(){
-        $(this).children("div").css({display:"none"})
+    $('.tab_im img').hover(function () {
+        var a = $(this).prop('src');
+        var index = $(this).parents('li').index();
+        $(this).parents('li').css('border', '2px solid red').siblings('li').css('border', '1px solid #ccc');
+        $(this).parents('ul').prev().find('img').prop('src', a);
+        $(this).parents('ul').siblings('.tab_JE').find('a').eq(list).css('display', 'block').siblings('a').css('display', 'none');
+        $(this).parents('ul').siblings('.tab_R').find('span').eq(list).css('display', 'block').siblings('span').css('display', 'none')
     });
 
-    $("#tab>li").click(function() {
+    $(".JD_ipone_one").hover(function () {
+        $(this).children("div").css({display: "block"})
+    }, function () {
+        $(this).children("div").css({display: "none"})
+    });
+
+    $("#tab>li").click(function () {
         var i = $(this).index();
         $("#container>div").hide().eq(i).show()
     });
-    $(".dizhi_show").hover(function(){
-        $(".dizhi_con").css({display:"block"})
-    },function(){
-        $(".dizhi_con").css({display:"none"})
+    $(".dizhi_show").hover(function () {
+        $(".dizhi_con").css({display: "block"})
+    }, function () {
+        $(".dizhi_con").css({display: "none"})
     });
-    $(".dizhi_con").hover(function(){
-        $(this).css({display:"block"})
-    },function(){
-        $(this).css({display:"none"})
+    $(".dizhi_con").hover(function () {
+        $(this).css({display: "block"})
+    }, function () {
+        $(this).css({display: "none"})
     });
     //显示隐藏
     var $li = $(".JD_nav_logo>div:gt(3)").hide();
-      $('.JD_show span').click(function(){
-          if($li.is(':hidden')){
-              $li.show();
-              $(this).css({width:"86px"}).text('收起 ^');
-          }else{
-              $li.hide();
-              $('.JD_show span').css({width:"291px"}).text('更多选项（ CPU核数、网络、机身颜色 等）');
-          }
-          return false;
-      });
-
-
-
-    $(".rig_tab>div").hover(function(){
-        var i = $(this).index();
-        $(this).find('.ico').css({display:'block'}).stop(true).animate({top:"190px"},300)
-    },function(){
-        var i = $(this).index();
-        $(this).find('.ico').css({display:'none'}).stop(true).animate({top:"230px"})
+    $('.JD_show span').click(function () {
+        if ($li.is(':hidden')) {
+            $li.show();
+            $(this).css({width: "86px"}).text('收起 ^');
+        } else {
+            $li.hide();
+            $('.JD_show span').css({width: "291px"}).text('更多选项（ CPU核数、网络、机身颜色 等）');
+        }
+        return false;
     });
 
-    $('.header_main_left>ul>li').hover(function() {
+
+    $(".rig_tab>div").hover(function () {
+        var i = $(this).index();
+        $(this).find('.ico').css({display: 'block'}).stop(true).animate({top: "190px"}, 300)
+    }, function () {
+        var i = $(this).index();
+        $(this).find('.ico').css({display: 'none'}).stop(true).animate({top: "230px"})
+    });
+
+    $('.header_main_left>ul>li').hover(function () {
         $(this).css({
             background: "#f0f0f0"
         }).find('.header_main_left_main').stop(true).fadeIn(300)
-    }, function() {
+    }, function () {
         $(this).css({
             background: "#fff"
         }).find(".header_main_left_a").css({
@@ -2086,31 +1947,31 @@
         });
         $(this).find('.header_main_left_main').stop(true).fadeOut(100)
     });
-    $(".header_sj a").hover(function() {
+    $(".header_sj a").hover(function () {
         $(this).css({
             background: "#444"
         })
-    }, function() {
+    }, function () {
         $(this).css({
             background: "#6e6568"
         })
     });
 
 
-    $(".nav_li1 a").hover(function(){
+    $(".nav_li1 a").hover(function () {
         $(".header_main_left").stop(true).fadeIn()
-    },function(){
+    }, function () {
         $(".header_main_left").stop(true).fadeOut()
     });
-    $(".header_main_left").hover(function(){
+    $(".header_main_left").hover(function () {
         $(this).stop(true).fadeIn()
-    },function(){
+    }, function () {
         $(this).stop(true).fadeOut()
     });
 
 
     //右侧侧边栏
-    $(".header_bar_box ul li").hover(function() {
+    $(".header_bar_box ul li").hover(function () {
         $(this).css({
             background: "#7A6E6E"
         }).children(".div").css({
@@ -2118,7 +1979,7 @@
         }).stop(true).animate({
             left: "-60px"
         }, 300)
-    }, function() {
+    }, function () {
         $(this).css({
             background: "#7A6E6E"
         }).children(".div").css({
@@ -2130,17 +1991,161 @@
 
 
     //底部
-    $(".footer_foot .p1 a").hover(function(){
-        $(this).css("color","#D70B1C")
-    },function(){
-        $(this).css("color","#727272")
+    $(".footer_foot .p1 a").hover(function () {
+        $(this).css("color", "#D70B1C")
+    }, function () {
+        $(this).css("color", "#727272")
     });
 
-    $(".footer .footer_center ol li a").hover(function(){
-        $(this).css("color","#D70B1C")
-    },function(){
-        $(this).css("color","#727272")
+    $(".footer .footer_center ol li a").hover(function () {
+        $(this).css("color", "#D70B1C")
+    }, function () {
+        $(this).css("color", "#727272")
     })
+
+    // 检索条件拼接
+    function searchProcucts(name, value) {
+
+        var href = location.href + "";
+
+        location.href = replaceAndAddParamVal(location.href, name, value, true);
+
+    }
+
+    // 搜索框搜索
+    function searchKeyword() {
+        var keyword = $("#keyword_input").val();
+        console.log(keyword.length);
+        if (keyword.length > 0) {
+            location.href = "http://search.gulimall.com/list.html?keyword=" + keyword;
+        } else {
+            location.href = "http://search.gulimall.com/list.html"
+        }
+    }
+
+    // 页码跳转
+    $(".page_a").click( function () {
+        var pn = $(this).attr("pn");
+        var href = location.href;
+        if (href.indexOf("pageNum") != -1) {
+            // 替换原来的页码
+            location.href = replaceAndAddParamVal(href, "pageNum", pn);
+        } else {
+            location.href = location.href + "&pageNum=" + pn;
+        }
+
+        return false; // 禁用默认行为 超链接默认跳转
+    });
+
+    // 修改或添加url的某个拼接参数的值
+    function replaceAndAddParamVal(url, paramName, replaceVal, forceAdd) {
+        var oUrl = url.toString();
+        var nUrl = "";
+
+        // 判断如果没有这个参数就添加，如果有这个字段就替换
+        if (oUrl.indexOf(paramName) != -1) { // 替换
+            if (forceAdd) { // 需要追加添加  -- 属性
+                if (oUrl.indexOf("?") != -1) {
+                    nUrl = oUrl + "&" + paramName + "=" + replaceVal;
+                } else {
+                    nUrl = oUrl + "?" + paramName + "=" + replaceVal;
+                }
+                return  nUrl;
+            } else {
+                var re = eval('/(' + paramName + '=)([^&]*)/gi');
+                nUrl = oUrl.replace(re, paramName + '=' + replaceVal);
+                return nUrl;
+            }
+        } else { // 添加
+            if (oUrl.indexOf("?") != -1) {
+                nUrl = oUrl + "&" + paramName + "=" + replaceVal;
+            } else {
+                nUrl = oUrl + "?" + paramName + "=" + replaceVal;
+            }
+            return  nUrl;
+
+        }
+
+    }
+
+    // 单击排序字段触发事件
+    $(".sort_a").click(function () {
+
+        //changeStyle($(this));
+
+        // 第一次点击设置为降序
+        $(this).toggleClass("desc"); // 加上就是降序 否则升序
+
+        var sort = $(this).attr("sort");
+        sort = $(this).hasClass("desc") ? sort + "_desc" : sort + "_asc";
+        location.href = replaceAndAddParamVal(location.href, "sort", sort);
+
+
+        return false;
+    });
+
+    // 单击价格区间检索确定按钮
+    $("#skuPriceSearchBtn").click(function () {
+        // 拼接价格区间检索条件
+
+        var from = $("#skuPriceFrom").val();
+        var to = $("#skuPriceTo").val();
+
+        var query = from + "_" + to;
+
+        location.href = replaceAndAddParamVal(location.href, "skuPrice", query);
+
+
+    });
+
+    $("#showHasStock").change(function () {
+
+        if ($(this).prop('checked')) {
+            location.href = replaceAndAddParamVal(location.href, "hasStock", 1);
+        } else {
+            var re = eval('/(hasStock=)([^&]*)/gi');
+            location.href = (location.href+"").replace(re, '');
+
+        }
+        return false;
+    });
+
+
+
+
+
+    function changeStyle(ele) {
+        // 改变当前被点击的元素和其他未被点击的元素的样式
+
+        // 'color: #333;border-color:#CCC;background: #FFF'
+
+        // 'color: #FFF;border-color:#e4393c;background: #e4393c'
+
+
+        $(".sort_a").css({"color": "#333", "border-color": "#CCC", "background": "#FFF"});
+
+        $(".sort_a").each(function () {
+            var text = $(this).text().replace("↓", "").replace("↑", "");
+            $(this).text(text);
+        });
+
+        $(ele).css({"color": "#FFF", "border-color": "#e4393c", "background": "#e4393c"});
+        // 判断升降序 使用 jQuery toggleClass() 方法。该方法对被选元素进行添加/删除类的切换操作
+        $(ele).toggleClass("desc"); // 加上就是降序 否则升序
+        if ($(ele).hasClass("desc")) {
+            // 降序
+            var text = $(ele).text().replace("↓", "").replace("↑", "");
+            text = text + "↓";
+            $(ele).text(text);
+        } else {
+            // 升序
+            var text = $(ele).text().replace("↓", "").replace("↑", "");
+            text = text + "↑";
+            $(ele).text(text);
+        }
+
+    }
+
 </script>
 </body>
 </html>
