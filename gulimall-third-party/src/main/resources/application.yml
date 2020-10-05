@@ -1,10 +1,18 @@
 spring:
   cloud:
     alicloud:
-
+      access-key: LTAI4G7cEZ5eTh9GgNuQP4HX
+      secret-key: lj4OXDMyaXFpukxucAturRQ9YMnWcm
       oss:
         endpoint: oss-cn-beijing.aliyuncs.com
         bucket: gulimaill-wangerfan
+      sms:
+        host: https://smsmsgs.market.alicloudapi.com
+        path: /sms/
+        skin: 5
+        sign: 1
+        appcode: 980eb5fac51d4fb58dbc4b1b58dc379e
+        ## TODO 修改
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
