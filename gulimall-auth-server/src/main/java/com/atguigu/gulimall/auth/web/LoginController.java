@@ -97,7 +97,9 @@ public class LoginController {
                          RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) { // 校验错误 收集错误信息
-            Map<String, String> errors = result.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            Map<String, String> errors = result.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+
             redirectAttributes.addFlashAttribute("errors", errors);
             return "redirect:http://auth.gulimall.com/reg.html";
         }

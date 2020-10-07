@@ -2,6 +2,7 @@ package com.atguigu.gulimall.thirdparty.controller;
 
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.thirdparty.component.SmsComponent;
+import com.atguigu.gulimall.thirdparty.component.SmsComponentTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SmsController {
 
     @Autowired
-    SmsComponent smsComponent;
+    SmsComponentTest smsComponent;
 
 
     /**

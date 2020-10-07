@@ -66,6 +66,8 @@ public class MemberController {
     /**
      * 会员登录
      * @param memberLoginVo
+                    private String loginacct;
+                    private String password;
      * @return
      */
     @PostMapping("/login")
